@@ -17,5 +17,8 @@
     "babel-preset-react": "^6.24.1",
     "webpack": "^4.1.1",
     "webpack-cli": "^2.0.12"
+  },
+  "scripts": {
+    "build": "webpack && cp -rf public/* ../backend/assets"
   }
 }

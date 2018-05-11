@@ -1,0 +1,14 @@
+* {
+    font-size: 12pt;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+#yelpsearch {
+    padding: 1em;
+    margin: 1em;
+    border: 1px solid black;
+}
