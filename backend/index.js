@@ -9,6 +9,8 @@ const queryString = require("querystring");
 const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo")(session);
 
+const City = require("./models/city");
+
 const dbUrl = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DB}`;
 mongoose.connect(dbUrl).catch(error => console.log(error));
 
@@ -37,23 +39,66 @@ app.use(session({
 }));
 
 app.get("/api/search/:city", function(req, res) {
-    yelpApi.get("/businesses/search?" + queryString.stringify({
-        location: req.params.city,
-        radius: 5000,
-        categories: "bars",
-        limit: 20
-    })).then(response => {
-        if(response.status == 200) {
-            res.json(response.data);
+    let q = req.params.city.toLowerCase();
+    City.remove({ date: { $lt: (Date.now() - 86400000) }});
+    City.findOne({ query: q }, function(err, city) {
+        if(err) {
+            console.log(err);
+            res.sendStatus(500);
+        } else if(city) {
+            console.log(city);
+            res.json(city);
         } else {
-            throw response;
+            yelpApi.get("/businesses/search?" + queryString.stringify({
+                location: q,
+                radius: 5000,
+                categories: "bars",
+                limit: 20
+            })).then(response => {
+                if(response.status == 200) {
+                    console.log(response);
+                    console.log(response.data);
+                    let c = new City({
+                        date: Date.now(),
+                        query: q,
+                        businesses: response.data.businesses.map(b => { return {
+                            id: b.id,
+                            name: b.name,
+                            image_url: b.image_url,
+                            rating: b.rating,
+                            price: b.price,
+                            distance: b.distance,
+                            users: []
+                        }})
+                    });
+                    c.save(function(err) {
+                        if(err) {
+                            console.log(err);
+                            res.sendStatus(500);
+                        } else {
+                            res.json(c);
+                        }
+                    });
+                } else {
+                    throw response;
+                }
+            }).catch(error => { 
+                console.log("----------------------------------------error----------------------------------------")
+                console.log(error);
+                console.log(error.data);
+                console.log("----------------------------------------end of error----------------------------------------")
+            });
         }
-    }).catch(error => { 
-        console.log("----------------------------------------error----------------------------------------")
-        console.log(error);
-        console.log(error.data);
-        console.log("----------------------------------------end of error----------------------------------------")
     });
+});
+
+app.get("/api/login", function(req, res) {
+    if(req.session && req.session.signed_in) {
+        res.send({ user_id: req.session.user_id, 
+                   screen_name: req.session.screen_name });
+    } else {
+        res.sendStatus(404);
+    }
 });
 
 app.get("/auth/twitter", function(req, res) {
@@ -87,6 +132,9 @@ app.get("/auth/twitter/callback", function(req, res) {
                 } else  {
                     req.session.oauth.access_token = oauth_access_token;
                     req.session.oauth.access_token_secret = oauth_access_token_secret;
+                    req.session.signed_in = true;
+                    req.session.user_id = results.user_id;
+                    req.session.screen_name = results.screen_name;
                     console.log("Callback from twitter");
                     console.log(req.session);
                     res.redirect("/");

@@ -4,7 +4,9 @@ export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            inputValue: ""
+            inputValue: "",
+            signed_in: false,
+            user: {}
         }
 
         this.handleChange = (e) => {
@@ -24,9 +26,21 @@ export default class App extends React.Component {
             }).then(response => console.log(response));
         }
     }
+
+    componentDidMount() {
+        fetch("/api/login")
+        .then(response => response.ok ? response.json() : null)
+        .then(json => json && this.setState({signed_in: true, user: json}))
+    }
+
     render() {
+        let signIn = <a href="/auth/twitter">Sign in with twitter</a>;
+        if(this.state.signed_in) {
+            signIn = <span>Hello, {this.state.user.screen_name}</span>;
+        }
         return(
             <div>
+                <div>{signIn}</div>
                 <input id="yelpsearch" 
                     type="text" 
                     onChange={this.handleChange} 
