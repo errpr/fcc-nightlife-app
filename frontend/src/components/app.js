@@ -39,9 +39,23 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
+        const storedState = localStorage.getItem("appState");
+        if(storedState) {
+            this.setState(JSON.parse(storedState));
+        }
         fetch("/api/login")
         .then(response => response.ok ? response.json() : null)
-        .then(json => json && this.setState({signed_in: true, user: json}))
+        .then(json => {
+            if(json) {
+                this.setState({signed_in: true, user: json});
+            } else {
+                this.setState({signed_in: false, user: json});
+            }
+        });
+    }
+
+    componentDidUpdate() {
+        localStorage.setItem("appState", JSON.stringify(this.state));
     }
 
     render() {
@@ -58,7 +72,10 @@ export default class App extends React.Component {
                     onKeyDown={this.handleKeys} 
                     value={this.state.inputValue} />
                 { this.state.results && 
-                    <ResultSet results={this.state.results} goingClick={this.goingClick} />
+                    <ResultSet 
+                        results={this.state.results} 
+                        goingClick={this.goingClick} 
+                        userid={this.state.user.user_id} />
                 }
             </div>
         );

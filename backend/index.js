@@ -115,10 +115,11 @@ app.get("/api/search/:city", function(req, res) {
                     throw response;
                 }
             }).catch(error => { 
-                console.log("----------------------------------------error----------------------------------------")
+                console.log("--------------------------------------- Yelp error -----------------------------------------");
                 console.log(error);
                 console.log(error.data);
-                console.log("----------------------------------------end of error----------------------------------------")
+                console.log("----------------------------------------end of error----------------------------------------");
+                res.sendStatus(500);
             });
         }
     });

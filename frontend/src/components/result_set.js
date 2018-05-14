@@ -5,7 +5,10 @@ function ResultSet(props) {
     const results = props.results.businesses.map((e, i) => { 
                         return(
                             <li key={i} className="result-item">
-                                <Business biz={e} goingClick={props.goingClick} />
+                                <Business 
+                                    biz={e} 
+                                    goingClick={props.goingClick}
+                                    userid={props.userid} />
                             </li>
                         ); 
                     });

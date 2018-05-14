@@ -1,6 +1,14 @@
 import React from 'react';
 
 function Business(props) {
+    let button =    <button 
+                        className="going-button"
+                        onClick={() => { props.goingClick(props.biz.id) }}>
+                        I'm going!
+                    </button>;
+    if(props.biz.users.indexOf(props.userid) >= 0) {
+        button = <button className="already-going-button">Already going.</button>;
+    }
     return(
         <div className="business-item">
             <img className="business-item-image" src={props.biz.image_url} />
@@ -11,9 +19,7 @@ function Business(props) {
             </p>
             <p className="business-item-users">
                 Going: {props.biz.users.length}<br />
-                <button onClick={() => { props.goingClick(props.biz.id) }}>
-                    I'm going!
-                </button>
+                {button}
             </p>
         </div>
     )
