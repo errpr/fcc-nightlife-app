@@ -39,17 +39,17 @@ app.use(session({
 }));
 
 app.post("/api/:city/:business", function(req, res) {
-    if(req.session && req.session.logged_in && req.session.user_id) {
+    if(req.session && req.session.signed_in && req.session.user_id) {
         const cid = req.params.city.toLowerCase();
         const bid = req.params.business;
         const uid = req.session.user_id;
-        City.findOne({id: cid}, function(err, city) {
+        City.findOne({query: cid}, function(err, city) {
             if(err) {
                 console.log(err);
                 res.sendStatus(500);
             } else {
-                const bizindex = city.businesses.findIndex((biz) => { return e.id == bid});
-                if(bizindex > 0) {
+                const bizindex = city.businesses.findIndex((biz) => { return biz.id == bid; });
+                if(bizindex >= 0) {
                     city.businesses.forEach((biz, i, a) => {
                         let uindex = biz.users.findIndex((user) => {
                             return user == uid;
@@ -60,6 +60,7 @@ app.post("/api/:city/:business", function(req, res) {
                     });
                     city.businesses[bizindex].users.push(uid);
                     city.save();
+                    console.log(city);
                     res.json(city);
                 } else {
                     res.sendStatus(400);
@@ -67,6 +68,7 @@ app.post("/api/:city/:business", function(req, res) {
             }
         });
     } else {
+        console.log(req.session);
         res.sendStatus(300);
     }
 });

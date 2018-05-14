@@ -28,6 +28,14 @@ export default class App extends React.Component {
             }).then(response => response.ok ? response.json() : null)
             .then(json => this.setState({results: json}));
         }
+
+        this.goingClick = (id) => {
+            fetch(`/api/${this.state.results.query}/${id}`, {
+                credentials: "same-origin",
+                method: "POST"
+            }).then(response => response.ok ? response.json() : null)
+            .then(json => this.setState({results: json}));
+        }
     }
 
     componentDidMount() {
@@ -50,7 +58,7 @@ export default class App extends React.Component {
                     onKeyDown={this.handleKeys} 
                     value={this.state.inputValue} />
                 { this.state.results && 
-                    <ResultSet results={this.state.results} />
+                    <ResultSet results={this.state.results} goingClick={this.goingClick} />
                 }
             </div>
         );
