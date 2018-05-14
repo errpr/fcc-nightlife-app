@@ -38,6 +38,39 @@ app.use(session({
     store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
 
+app.post("/api/:city/:business", function(req, res) {
+    if(req.session && req.session.logged_in && req.session.user_id) {
+        const cid = req.params.city.toLowerCase();
+        const bid = req.params.business;
+        const uid = req.session.user_id;
+        City.findOne({id: cid}, function(err, city) {
+            if(err) {
+                console.log(err);
+                res.sendStatus(500);
+            } else {
+                const bizindex = city.businesses.findIndex((biz) => { return e.id == bid});
+                if(bizindex > 0) {
+                    city.businesses.forEach((biz, i, a) => {
+                        let uindex = biz.users.findIndex((user) => {
+                            return user == uid;
+                        });
+                        if(uindex >= 0) {
+                            a[i].users.splice(uindex, 1);
+                        }
+                    });
+                    city.businesses[bizindex].users.push(uid);
+                    city.save();
+                    res.json(city);
+                } else {
+                    res.sendStatus(400);
+                }
+            }
+        });
+    } else {
+        res.sendStatus(300);
+    }
+});
+
 app.get("/api/search/:city", function(req, res) {
     let q = req.params.city.toLowerCase();
     City.remove({ date: { $lt: (Date.now() - 86400000) }});
@@ -46,7 +79,6 @@ app.get("/api/search/:city", function(req, res) {
             console.log(err);
             res.sendStatus(500);
         } else if(city) {
-            console.log(city);
             res.json(city);
         } else {
             yelpApi.get("/businesses/search?" + queryString.stringify({
@@ -56,8 +88,6 @@ app.get("/api/search/:city", function(req, res) {
                 limit: 20
             })).then(response => {
                 if(response.status == 200) {
-                    console.log(response);
-                    console.log(response.data);
                     let c = new City({
                         date: Date.now(),
                         query: q,
@@ -111,8 +141,6 @@ app.get("/auth/twitter", function(req, res) {
                 token: oauth_token,
                 token_secret: oauth_token_secret 
             }
-            console.log("Redirection to twitter");
-            console.log(req.session);
             res.redirect("https://twitter.com/oauth/authenticate?oauth_token=" + oauth_token);
         }
     });
@@ -135,8 +163,6 @@ app.get("/auth/twitter/callback", function(req, res) {
                     req.session.signed_in = true;
                     req.session.user_id = results.user_id;
                     req.session.screen_name = results.screen_name;
-                    console.log("Callback from twitter");
-                    console.log(req.session);
                     res.redirect("/");
                 }
             }

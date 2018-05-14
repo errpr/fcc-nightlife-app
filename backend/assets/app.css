@@ -12,3 +12,43 @@
     margin: 1em;
     border: 1px solid black;
 }
+
+.result-set {
+    display: flex;
+    flex-flow: row wrap;
+    list-style: none;
+}
+
+.result-item {
+    height: 100%;
+    width: 100%;
+    max-height: 200px;
+    max-width: 600px;
+    margin: 0.5em;
+}
+
+.business-item {
+    height: 100%;
+    width: 100%;
+    max-height: 200px;
+    max-width: 600px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    padding: 0.5em;
+    margin: 0.5em;
+    border: 3px solid black;
+    border-radius: 25px;
+}
+
+.business-item:hover {
+    border: 3px solid lightblue;
+}
+
+.business-item-image {
+    grid-row: 1 / 4;
+    grid-column: 1 / 2;
+    max-width: 100%;
+    max-height: 100%;
+    padding: 0.5em;
+}

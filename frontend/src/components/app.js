@@ -1,4 +1,5 @@
 import React from 'react';
+import ResultSet from './result_set';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -6,7 +7,8 @@ export default class App extends React.Component {
         this.state = {
             inputValue: "",
             signed_in: false,
-            user: {}
+            user: {},
+            results: null
         }
 
         this.handleChange = (e) => {
@@ -23,7 +25,8 @@ export default class App extends React.Component {
         this.submit = (query) => {
             fetch("/api/search/" + query, {
                 credentials: "same-origin"
-            }).then(response => console.log(response));
+            }).then(response => response.ok ? response.json() : null)
+            .then(json => this.setState({results: json}));
         }
     }
 
@@ -46,6 +49,9 @@ export default class App extends React.Component {
                     onChange={this.handleChange} 
                     onKeyDown={this.handleKeys} 
                     value={this.state.inputValue} />
+                { this.state.results && 
+                    <ResultSet results={this.state.results} />
+                }
             </div>
         );
     }
