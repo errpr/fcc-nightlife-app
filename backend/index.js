@@ -60,7 +60,6 @@ app.post("/api/:city/:business", function(req, res) {
                     });
                     city.businesses[bizindex].users.push(uid);
                     city.save();
-                    console.log(city);
                     res.json(city);
                 } else {
                     res.sendStatus(400);
@@ -68,6 +67,7 @@ app.post("/api/:city/:business", function(req, res) {
             }
         });
     } else {
+        console.log("Posting without proper authorization");
         console.log(req.session);
         res.sendStatus(300);
     }
@@ -115,10 +115,9 @@ app.get("/api/search/:city", function(req, res) {
                     throw response;
                 }
             }).catch(error => { 
-                console.log("--------------------------------------- Yelp error -----------------------------------------");
+                console.log("Yelp error -----------------------------------------");
                 console.log(error);
                 console.log(error.data);
-                console.log("----------------------------------------end of error----------------------------------------");
                 res.sendStatus(500);
             });
         }

@@ -7,16 +7,43 @@
     box-sizing: border-box;
 }
 
+.top-bar {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-content: center;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 #yelpsearch {
     display: block;
     padding: 1em;
     margin-top: 1em;
     margin-bottom: 1em;
     border: 1px solid black;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    max-width: 600px;
+    flex-grow: 3;
+}
+
+.user-info {
+    flex-grow: 1;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-content: center;
+}
+
+.user-name {
+    text-align: center;
+}
+
+.sign-in-button {
+    padding: 0.5em;
+    margin: 0.5em;
+    border: none;
+    background: none;
+    text-decoration: underline;
 }
 
 .result-set {

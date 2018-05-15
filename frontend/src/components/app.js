@@ -1,5 +1,6 @@
 import React from 'react';
 import ResultSet from './result_set';
+import TopBar from './topbar';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -9,17 +10,6 @@ export default class App extends React.Component {
             signed_in: false,
             user: {},
             results: null
-        }
-
-        this.handleChange = (e) => {
-            this.setState({inputValue: e.target.value});
-        }
-
-        this.handleKeys = (e) => {
-            switch(e.key) {
-                case("Enter"): this.submit(e.target.value); break;
-                default: break;
-            }
         }
 
         this.submit = (query) => {
@@ -34,7 +24,17 @@ export default class App extends React.Component {
                 credentials: "same-origin",
                 method: "POST"
             }).then(response => response.ok ? response.json() : null)
-            .then(json => this.setState({results: json}));
+            .then(json => {
+                if(json) {
+                    this.setState({results: json})
+                } else {
+                    this.twitterSignIn();
+                }
+            });
+        }
+
+        this.twitterSignIn = () => {
+            window.location.assign(window.location.origin + "/auth/twitter");
         }
     }
 
@@ -59,23 +59,17 @@ export default class App extends React.Component {
     }
 
     render() {
-        let signIn = <a href="/auth/twitter">Sign in with twitter</a>;
-        if(this.state.signed_in) {
-            signIn = <span>Hello, {this.state.user.screen_name}</span>;
-        }
         return(
             <div>
-                <div>{signIn}</div>
-                <input id="yelpsearch" 
-                    type="text" 
-                    onChange={this.handleChange} 
-                    onKeyDown={this.handleKeys} 
-                    value={this.state.inputValue} />
-                { this.state.results && 
+                <TopBar 
+                    submit={this.submit}
+                    user={this.state.user} 
+                    twitterSignIn={this.twitterSignIn} />
+                { this.state.results &&
                     <ResultSet 
                         results={this.state.results} 
                         goingClick={this.goingClick} 
-                        userid={this.state.user.user_id} />
+                        userid={this.state.user ? this.state.user.user_id : null} />
                 }
             </div>
         );
