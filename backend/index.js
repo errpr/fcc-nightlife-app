@@ -75,7 +75,10 @@ app.post("/api/:city/:business", function(req, res) {
 
 app.get("/api/search/:city", function(req, res) {
     let q = req.params.city.toLowerCase();
-    City.remove({ date: { $lt: (Date.now() - 86400000) }});
+    City.deleteMany({ date: { $lt: (Date.now() - 86400000) }}, function(err) {
+        console.log("Deleted records");
+        }
+    );
     City.findOne({ query: q }, function(err, city) {
         if(err) {
             console.log(err);
