@@ -25,7 +25,7 @@ let oa = new OAuth("https://twitter.com/oauth/request_token",
                     "https://twitter.com/oauth/access_token",
                     process.env.TWITTER_KEY, process.env.TWITTER_SECRET,
                     "1.0A", 
-                    "http://localhost:3000/auth/twitter/callback", 
+                    process.env.TWITTER_CALLBACK_URL, 
                     "HMAC-SHA1");
 
 let app = express();
@@ -76,9 +76,10 @@ app.post("/api/:city/:business", function(req, res) {
 app.get("/api/search/:city", function(req, res) {
     let q = req.params.city.toLowerCase();
     City.deleteMany({ date: { $lt: (Date.now() - 86400000) }}, function(err) {
-        console.log("Deleted records");
+        if(err) {
+            console.log(err);
         }
-    );
+    });
     City.findOne({ query: q }, function(err, city) {
         if(err) {
             console.log(err);
